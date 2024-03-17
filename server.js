@@ -202,11 +202,19 @@ const requestListener = (req, res) => {
     const params = new URLSearchParams(req.url.split("?")[1]);
     const pageNumber = parseInt(params.get("page"));
     const limit = parseInt(params.get("limit"));
-
+    const orderByColumn = params.get("orderByColumn");
+    const orderByAsc = params.get("orderByAsc");
     const skipCount = (pageNumber - 1) * limit;
+
+    const sortOptions = {};
+    if (orderByColumn && orderByAsc) {
+      sortOptions[orderByColumn] = orderByAsc === "true" ? 1 : -1;
+    }
+
     TodoModel.find()
       .skip(skipCount)
       .limit(limit)
+      .sort(sortOptions) // 应用排序条件
       .exec()
       .then((todos) => {
         res.writeHead(200, headers);
