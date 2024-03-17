@@ -1,10 +1,15 @@
+//SECTION - 引用模組
 const http = require("http");
 const { v4: uuidv4 } = require("uuid");
 const mongoose = require("mongoose");
 const errorHandle = require("./errorHandler");
+
+//NOTE - 給定初始空陣列
 const todoListData = [];
+
 require("dotenv").config();
-const DATABASE_NAME = "todolist-kata"; // Specify the database name here
+
+const DATABASE_NAME = "todolist-kata";
 const DATABASE =
   process.env.DATABASE + DATABASE_NAME + "?retryWrites=true&w=majority";
 
@@ -13,20 +18,9 @@ mongoose.connect(DATABASE, {
   useUnifiedTopology: true,
 });
 
+//TODO - 連接DB
 mongoose.connection.once("open", () => {
   console.log("MongoDB connection successful");
-
-  // Define Todo schema
-  const todoSchema = new mongoose.Schema({
-    title: String,
-    uuid: String,
-  });
-  const kittySchema = new mongoose.Schema({
-    name: String,
-  });
-  //   const Kitten = mongoose.model("Kitten", kittySchema);
-  //   const silence = new Kitten({ name: "Silence" });
-  //   console.log(silence.name); // 'Silence'
 });
 
 mongoose.connection.on(
@@ -36,6 +30,9 @@ mongoose.connection.on(
 const todoSchema = new mongoose.Schema({
   title: String,
   uuid: String,
+  createAt: { type: Date, default: Date.now },
+  updateAt: { type: Date, default: Date.now },
+  done: { type: Boolean, default: false },
 });
 
 const TodoModel = mongoose.model("Todo", todoSchema);
@@ -214,7 +211,7 @@ const requestListener = (req, res) => {
     TodoModel.find()
       .skip(skipCount)
       .limit(limit)
-      .sort(sortOptions) // 应用排序条件
+      .sort(sortOptions)
       .exec()
       .then((todos) => {
         res.writeHead(200, headers);
