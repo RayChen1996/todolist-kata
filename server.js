@@ -36,7 +36,7 @@ const todoSchema = new mongoose.Schema({
 });
 
 const TodoModel = mongoose.model("Todo", todoSchema);
-const requestListener = (req, res) => {
+const requestListenerFn = (req, res) => {
   const headers = {
     "Access-Control-Allow-Headers":
       "Content-Type, Authorization, Content-Length, X-Requested-With",
@@ -238,6 +238,7 @@ const requestListener = (req, res) => {
       .sort(sortOptions)
       .exec()
       .then((todos) => {
+        console.log(todos);
         res.writeHead(200, headers);
         res.end(
           JSON.stringify({
@@ -292,5 +293,5 @@ const requestListener = (req, res) => {
   }
 };
 
-const server = http.createServer(requestListener);
+const server = http.createServer(requestListenerFn);
 server.listen(process.env.PORT || 3005);
