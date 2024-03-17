@@ -52,15 +52,39 @@ const requestListener = (req, res) => {
 
   if (req.url == "/todos" && req.method == "GET") {
     /**SECTION - 取得所有 */
-    res.writeHead(200, headers);
-    res.write(
-      JSON.stringify({
-        status: "success",
-        message: "取得待辦列表成功",
-        data: todoListData,
+    // res.writeHead(200, headers);
+    // res.write(
+    //   JSON.stringify({
+    //     status: "success",
+    //     message: "取得待辦列表成功",
+    //     data: todoListData,
+    //   })
+    // );
+    // res.end();
+
+    //TODO - 之後考慮資料一多，要多加固定撈的頁數
+    TodoModel.find()
+      .exec()
+      .then((todos) => {
+        res.writeHead(200, headers);
+        res.end(
+          JSON.stringify({
+            status: "success",
+            message: `取得[所有]待辦事項成功`,
+            data: todos,
+          })
+        );
       })
-    );
-    res.end();
+      .catch((err) => {
+        console.error("Error fetching todos:", err);
+        res.writeHead(500, headers);
+        res.end(
+          JSON.stringify({
+            status: "error",
+            message: "無法從資料庫獲取待辦事項",
+          })
+        );
+      });
   } else if (req.url == "/todos" && req.method == "POST") {
     //TODO - 新增Todos
 
